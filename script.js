@@ -127,3 +127,22 @@ const keys = [
     createPiano();
     addEventListeners();
   });
+  // ... (código anterior)
+
+// Función para generar una canción aleatoria
+function generateSong() {
+    const numberOfNotes = 16; // Número de notas en la canción
+    const delayBetweenNotes = 500; // Retardo entre notas en milisegundos
+  
+    for (let i = 0; i < numberOfNotes; i++) {
+      setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * keys.length); // Selecciona una nota al azar
+        handleKeyPress(randomIndex); // Toca la nota
+      }, i * delayBetweenNotes); // Añade un retardo entre notas
+    }
+  }
+  
+  // Añadir evento al botón de generación de canción
+  document.getElementById('generate-song').addEventListener('click', generateSong);
+  
+  // ... (resto del código)
