@@ -17,141 +17,113 @@ const keys = [
     '6': 5, '7': 6, '8': 7, '9': 8, '0': 9
   };
   
-  // Contexto de audio
   let audioContext;
   
-  // Inicializar el audioContext al primer clic/toque
   function initAudio() {
     if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      document.removeEventListener('click', initAudio);
-      document.removeEventListener('touchstart', initAudio);
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        document.removeEventListener('click', initAudio);
+        document.removeEventListener('touchstart', initAudio);
+      } catch (error) {
+        console.error('Error al inicializar el AudioContext:', error);
+      }
     }
   }
   
   document.addEventListener('click', initAudio);
   document.addEventListener('touchstart', initAudio, { passive: false });
   
-  // Función para tocar una nota
   function playNote(frequency) {
     if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      initAudio();
     }
-    
+  
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+  
     oscillator.type = 'sine';
     oscillator.frequency.value = frequency;
-    
+  
     gainNode.gain.setValueAtTime(0.7, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
-    
+  
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+  
     oscillator.start();
     oscillator.stop(audioContext.currentTime + 1);
-    
-    return oscillator;
   }
   
-  // Crear el piano
+  function createKeyElement(key, index) {
+    const keyElement = document.createElement('div');
+    keyElement.className = `key ${key.type}`;
+    keyElement.dataset.index = index;
+  
+    const labelElement = document.createElement('div');
+    labelElement.className = 'key-label';
+    labelElement.textContent = key.label;
+  
+    keyElement.appendChild(labelElement);
+    return keyElement;
+  }
+  
   function createPiano() {
     const pianoElement = document.getElementById('piano');
-    
-    // Primero crear las teclas blancas
     const whiteKeys = keys.filter(key => key.type === 'white');
+  
+    // Crear teclas blancas
     whiteKeys.forEach((key, index) => {
-      const keyElement = document.createElement('div');
-      keyElement.className = 'key';
-      keyElement.dataset.index = keys.findIndex(k => k.note === key.note);
-      
-      const labelElement = document.createElement('div');
-      labelElement.className = 'key-label';
-      labelElement.textContent = key.label;
-      
-      keyElement.appendChild(labelElement);
-      pianoElement.appendChild(keyElement);
+      pianoElement.appendChild(createKeyElement(key, index));
     });
-    
-    // Luego crear las teclas negras superpuestas
-    const blackKeys = keys.filter(key => key.type === 'black');
-    blackKeys.forEach(key => {
-      const keyElement = document.createElement('div');
-      keyElement.className = 'key black';
-      keyElement.dataset.index = keys.findIndex(k => k.note === key.note);
-      
-      // Posicionar la tecla negra
+  
+    // Crear teclas negras
+    keys.filter(key => key.type === 'black').forEach(key => {
+      const keyElement = createKeyElement(key, keys.findIndex(k => k.note === key.note));
       const whiteKeyWidth = 100 / whiteKeys.length;
       const position = key.position / 100 * (whiteKeys.length - 1) * whiteKeyWidth;
       keyElement.style.left = position + '%';
-      
-      const labelElement = document.createElement('div');
-      labelElement.className = 'key-label';
-      labelElement.textContent = key.label;
-      
-      keyElement.appendChild(labelElement);
       pianoElement.appendChild(keyElement);
     });
   }
   
-  // Función para manejar el toque o clic en una tecla
   function handleKeyPress(index) {
-    if (index >= 0 && index < keys.length) {
-      const key = keys[index];
-      const keyElement = document.querySelector(`.key[data-index="${index}"]`);
-      
-      if (keyElement) {
-        // Efecto visual
-        keyElement.classList.add('pressed');
-        setTimeout(() => {
-          keyElement.classList.remove('pressed');
-        }, 300);
-        
-        // Reproducir sonido
-        playNote(key.freq);
-      }
+    const key = keys[index];
+    const keyElement = document.querySelector(`.key[data-index="${index}"]`);
+  
+    if (keyElement) {
+      keyElement.classList.add('pressed');
+      setTimeout(() => keyElement.classList.remove('pressed'), 300);
+      playNote(key.freq);
     }
   }
   
-  // Event listeners para interfaces táctiles
-  function addTouchListeners() {
-    const keyElements = document.querySelectorAll('.key');
-    keyElements.forEach(key => {
-      key.addEventListener('touchstart', function(e) {
+  function addEventListeners() {
+    const pianoElement = document.getElementById('piano');
+  
+    // Delegación de eventos para clics y toques
+    pianoElement.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('key')) {
+        handleKeyPress(e.target.dataset.index);
+      }
+    });
+  
+    pianoElement.addEventListener('touchstart', (e) => {
+      if (e.target.classList.contains('key')) {
         e.preventDefault();
-        const index = parseInt(this.dataset.index);
-        handleKeyPress(index);
-      }, { passive: false });
-    });
-  }
+        handleKeyPress(e.target.dataset.index);
+      }
+    }, { passive: false });
   
-  // Event listeners para clics del ratón
-  function addMouseListeners() {
-    const keyElements = document.querySelectorAll('.key');
-    keyElements.forEach(key => {
-      key.addEventListener('mousedown', function() {
-        const index = parseInt(this.dataset.index);
-        handleKeyPress(index);
-      });
-    });
-  }
-  
-  // Event listener para el teclado (teclas numéricas)
-  function addKeyboardListeners() {
-    document.addEventListener('keydown', function(e) {
+    // Evento de teclado
+    document.addEventListener('keydown', (e) => {
       if (e.key in keyboardMap) {
-        const index = keyboardMap[e.key];
-        handleKeyPress(index);
+        handleKeyPress(keyboardMap[e.key]);
       }
     });
   }
   
-  // Inicializar todo
-  window.addEventListener('DOMContentLoaded', function() {
+  window.addEventListener('DOMContentLoaded', () => {
     createPiano();
-    addTouchListeners();
-    addMouseListeners();
-    addKeyboardListeners();
+    addEventListeners();
   });

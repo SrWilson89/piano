@@ -7,18 +7,22 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Piano Interactivo</h1>
+  <header>
+    <h1>Piano Interactivo</h1>
+  </header>
   
-  <div class="piano-container">
-    <div id="piano" class="piano">
-      <!-- Las teclas se generarán con JavaScript -->
+  <main>
+    <div class="piano-container" role="application" aria-label="Piano interactivo">
+      <div id="piano" class="piano" role="group" aria-label="Teclas del piano">
+        <!-- Las teclas se generarán con JavaScript -->
+      </div>
     </div>
-  </div>
-  
-  <div class="instructions">
-    <p>En PC: Usa las teclas numéricas 1-9 y 0 para tocar.</p>
-    <p>En móvil: Toca las teclas directamente con los dedos.</p>
-  </div>
+    
+    <div class="instructions" aria-label="Instrucciones de uso">
+      <p>En PC: Usa las teclas numéricas 1-9 y 0 para tocar.</p>
+      <p>En móvil: Toca las teclas directamente con los dedos.</p>
+    </div>
+  </main>
   
   <script src="script.js"></script>
 </body>

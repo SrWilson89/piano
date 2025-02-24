@@ -1,4 +1,16 @@
-body {
+:root {
+    --white-key-color: white;
+    --black-key-color: black;
+    --pressed-white-key-color: #a0c0ff;
+    --pressed-black-key-color: #3060a0;
+    --piano-background: #222;
+    --key-border-color: #ccc;
+    --key-label-color: #555;
+    --key-label-black-color: #ddd;
+    --piano-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  body {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
@@ -16,10 +28,10 @@ body {
   }
   
   .piano-container {
-    background-color: #222;
+    background-color: var(--piano-background);
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--piano-shadow);
     width: 100%;
     max-width: 800px;
   }
@@ -38,18 +50,18 @@ body {
     justify-content: center;
     align-items: flex-end;
     padding-bottom: 10px;
-    background-color: white;
-    border: 1px solid #ccc;
+    background-color: var(--white-key-color);
+    border: 1px solid var(--key-border-color);
     border-radius: 0 0 5px 5px;
     cursor: pointer;
     margin: 0 2px;
     user-select: none;
-    transition: background-color 0.1s;
+    transition: background-color 0.1s ease-in-out;
   }
   
   .key.black {
-    background-color: black;
-    color: white;
+    background-color: var(--black-key-color);
+    color: var(--white-key-color);
     position: absolute;
     width: 8%;
     height: 60%;
@@ -58,11 +70,11 @@ body {
   }
   
   .key.pressed {
-    background-color: #a0c0ff;
+    background-color: var(--pressed-white-key-color);
   }
   
   .key.black.pressed {
-    background-color: #3060a0;
+    background-color: var(--pressed-black-key-color);
   }
   
   .instructions {
@@ -74,11 +86,11 @@ body {
   .key-label {
     font-size: 14px;
     font-weight: bold;
-    color: #555;
+    color: var(--key-label-color);
   }
   
   .key.black .key-label {
-    color: #ddd;
+    color: var(--key-label-black-color);
   }
   
   @media (max-width: 600px) {
